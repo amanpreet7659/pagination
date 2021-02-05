@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pagination with JQuery</title>
+  </head>
+  <style>
+    table,
+    thead,
+    tbody,
+    th,
+    tr,
+    td {
+      border: 2px black solid;
+    }
+    #search {
+      width: 50%;
+      float: left;
+    }
+    #sebar {
+      margin: auto;
+      width: 50%;
+      float: right;
+    }
+  </style>
+  <body>
+    <form action="" id="form1">
+      <div id="search">
+        <h1>Airline Data API</h1>
+      </div>
+      </div>
+      <center>
+        <div style="height: auto; margin: auto">
+          <table>
+            <thead>
+              <th>SNo.</th>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Trips</th>
+              <th>AirLine-ID</th>
+              <th>AirLine-Name</th>
+              <th>AirLine-Country</th>
+              <th>AirLine-Logo</th>
+              <th>AirLine-Slogan</th>
+              <th>AirLine-Head_Quaters</th>
+              <th>AirLine-Website</th>
+              <th>AirLine-Established</th>
+            </thead>
+            <tbody id="result"></tbody>
+          </table>
+          <br />
+        </div>
+        <div id="buttons"></div>
+      </center>
+    </form>
+  </body>
+  <script src="js/jquery-3.5.1.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    var arraydata = [],
+      disp;
+    var TP,
+      currentpage = 1,
+      previouspage = parseInt(currentpage) - 1;
+
+    $(document).ready(function () {
+      butt();
+      var sno = currentpage * 20 - 20 + 1;
+      //-------------------ADDING BUTTONS-----------------------//
+      function butt() {
+        $("#first").prop("disabled", true);
+        $("#second").prop("disabled", true);
+        var tempbutton = $("#buttons");
+        tempbutton.empty;
+        tempbutton = `<input id="first" type="button" onclick="event.preventDefault()" value="First"></input>
+                        <input id="second" type="button" onclick="event.preventDefault()" value="Prev"></input>
+                        <input id="third" type="button" onclick="event.preventDefault(),page1()" value="1"></input>
+                        <input id="fourth" type="button" onclick="event.preventDefault(),page2()" value="2"></input>
+                        <input id="fifth" type="button" onclick="event.preventDefault(),page3()" value="3"></input>
+                        <input id="sixth" type="button" onclick="event.preventDefault(),page4()" value="4"></input>
+                        <input id="sevanth" type="button" onclick="event.preventDefault(),page5()" value="5"></input>
+                        <input id="eighth" type="button" onclick="event.preventDefault()" value="Next"></input>
+                        <input id="ninegth" type="button" onclick="event.preventDefault()" value="Last"></input>`;
+        $("#buttons").html(tempbutton);
+      }
+      if ($("#third").val() == 1) {
+        $("#first").prop("disabled", true);
+        $("#second").prop("disabled", true);
+      }
+      //------------------------------NEXT BUTTON------------------------//
+      $("#eighth").click(function () {
+        currentpage++;
+        if ($("#sevanth").val() == TP) {
+          if ($("#third").val() == currentpage) {
+            getData($("#third").val())
+            $("#third").css("background", "red");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#fourth").val() == currentpage) {
+            getData($("#fourth").val())
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "red");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#fifth").val() == currentpage) {
+            getData($("#fifth").val())
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "red");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#sixth").val() == currentpage) {
+            getData($("#sixth").val())
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "red");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#sevanth").val() == currentpage) {
+            getData($("#sevanth").val())
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "red");
+          }
+          if (currentpage == TP) {
+            $("#eighth").prop("disabled", true);
+            $("#ninegth").prop("disabled", true);
+          }
+          return (disp = false);
+        } else {
+          getData(parseInt(currentpage));
+          $("#first").prop("disabled", false);
+          $("#second").prop("disabled", false);
+
+          var f = parseInt($("#third").val()),
+            g = parseInt($("#fourth").val()),
+            h = parseInt($("#fifth").val()),
+            i = parseInt($("#sixth").val()),
+            j = parseInt($("#sevanth").val());
+
+          $("#third").val((f += 1));
+          $("#fourth").val((g += 1));
+          $("#fifth").val((h += 1));
+          $("#sixth").val((i += 1));
+          $("#sevanth").val((j += 1));
+        }
+      });
+      //-------------------PREVIOUS BUTTON--------------------//
+      $("#second").click(function () {
+        if (currentpage == 1) {
+          $("#first").prop("disabled", true);
+          $("#second").prop("disabled", true);
+        } else {
+          currentpage = currentpage - 1;
+          getData(currentpage);
+          var f = parseInt($("#third").val()),
+            g = parseInt($("#fourth").val()),
+            h = parseInt($("#fifth").val()),
+            i = parseInt($("#sixth").val()),
+            j = parseInt($("#sevanth").val());
+
+          if ($("#third").val() == currentpage) {
+            $("#third").css("background", "red");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#fourth").val() == currentpage) {
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "red");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#fifth").val() == currentpage) {
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "red");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#sixth").val() == currentpage) {
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "red");
+            $("#sevanth").css("background", "none");
+          }
+          if ($("#sevanth").val() == currentpage) {
+            $("#third").css("background", "none");
+            $("#fourth").css("background", "none");
+            $("#fifth").css("background", "none");
+            $("#sixth").css("background", "none");
+            $("#sevanth").css("background", "red");
+          }
+          if ($("#third").val() == 1) {
+            return true;
+          } else {
+            $("#third").val((f = f - 1));
+            $("#fourth").val((g = g - 1));
+            $("#fifth").val((h = h - 1));
+            $("#sixth").val((i = i - 1));
+            $("#sevanth").val((j = j - 1));
+          }
+        }
+        if (disp == false) {
+          $("#eighth").prop("disabled", false);
+          $("#ninegth").prop("disabled", false);
+        }
+      });
+      //--------------------------LAST PAGE----------------------------//
+      $("#ninegth").click(function () {
+        getData(207);
+        var t1 = TP - $("#third").val(),
+          t2 = TP - $("#fourth").val(),
+          t3 = TP - $("#fifth").val(),
+          t4 = TP - $("#sixth").val(),
+          t5 = TP - $("#sevanth").val();
+        $("#third").css("background", "none");
+        $("#fourth").css("background", "none");
+        $("#fifth").css("background", "none");
+        $("#sixth").css("background", "none");
+        $("#sevanth").css("background", "red");
+
+        $("#third").val(parseInt($("#third").val()) + t1 - 4);
+        $("#fourth").val(parseInt($("#fourth").val()) + t2 - 3);
+        $("#fifth").val(parseInt($("#fifth").val()) + t3 - 2);
+        $("#sixth").val(parseInt($("#sixth").val()) + t4 - 1);
+        $("#sevanth").val(parseInt($("#sevanth").val()) + t5);
+        currentpage = $("#sevanth").val();
+
+        if ($("#sevanth").val() == TP) {
+          $("#eighth").prop("disabled", true);
+          $("#ninegth").prop("disabled", true);
+          $("#first").prop("disabled", false);
+          $("#second").prop("disabled", false);
+          return (disp = false);
+        }
+      });
+      //------------------FIRST PAGE---------------------//
+      $("#first").click(function () {
+        $("#third").val(1);
+        $("#fourth").val(2);
+        $("#fifth").val(3);
+        $("#sixth").val(4);
+        $("#sevanth").val(5);
+
+        $("#first").prop("disabled", true);
+        $("#second").prop("disabled", true);
+        $("#eighth").prop("disabled", false);
+        $("#ninegth").prop("disabled", false);
+        getData(1);
+        $("#third").css("background", "red");
+        $("#fourth").css("background", "none");
+        $("#fifth").css("background", "none");
+        $("#sixth").css("background", "none");
+        $("#sevanth").css("background", "none");
+      });
+      getData(1);
+    });
+    function page1() {
+      var pno = $("#third").val();
+      console.log("pageno" + pno);
+      currentpage = pno;
+
+      getData(pno);
+      $("#third").css("background", "red");
+      $("#fourth").css("background", "none");
+      $("#fifth").css("background", "none");
+      $("#sixth").css("background", "none");
+      $("#sevanth").css("background", "none");
+      
+
+    }
+    function page2() {
+      $("#first").prop("disabled", false);
+      $("#second").prop("disabled", false);
+      var pno = $("#fourth").val();
+      console.log("pageno" + pno);
+      currentpage = pno;
+
+      getData(pno);
+      $("#third").css("background", "none");
+      $("#fourth").css("background", "red");
+      $("#fifth").css("background", "none");
+      $("#sixth").css("background", "none");
+      $("#sevanth").css("background", "none");
+    }
+    function page3() {
+      $("#first").prop("disabled", false);
+      $("#second").prop("disabled", false);
+      var pno = $("#fifth").val();
+      console.log("pageno" + pno);
+      currentpage = pno;
+
+      getData(pno);
+      $("#third").css("background", "none");
+      $("#fourth").css("background", "none");
+      $("#fifth").css("background", "red");
+      $("#sixth").css("background", "none");
+      $("#sevanth").css("background", "none");
+    }
+    function page4() {
+      $("#first").prop("disabled", false);
+      $("#second").prop("disabled", false);
+      var pno = $("#sixth").val();
+      console.log("pageno" + pno);
+      currentpage = pno;
+
+      getData(pno);
+      $("#third").css("background", "none");
+      $("#fourth").css("background", "none");
+      $("#fifth").css("background", "none");
+      $("#sixth").css("background", "red");
+      $("#sevanth").css("background", "none");
+    }
+    function page5() {
+      $("#first").prop("disabled", false);
+      $("#second").prop("disabled", false);
+      var pno = $("#sevanth").val();
+      console.log("pageno" + pno);
+      currentpage = pno;
+
+      getData(pno);
+      $("#third").css("background", "none");
+      $("#fourth").css("background", "none");
+      $("#fifth").css("background", "none");
+      $("#sixth").css("background", "none");
+      $("#sevanth").css("background", "red");
+    }
+    //---------------------FETCHING DATA-------------------//
+    function getData(a) {
+      fetch(`https://api.instantwebtools.net/v1/passenger?page=${a}&size=20`)
+        .then((data) => data.json())
+        .then((res) => {
+          var temp = $("#result");
+          var sno = currentpage * 20 - 20 + 1;
+          if (a == 1) {
+            sno = 1;
+          }
+          if (res.data.length == "") {
+            temp.empty();
+            for (let i = 0; i < arraydata.data.length; i++) {
+              temp += `<tr>
+          <td>${sno}</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          <td>No Record Found</td>
+          </tr>`;
+              sno++;
+            }
+            $("#result").html(temp);
+          } else {
+            arraydata = res;
+            TP = arraydata.totalPages;
+            console.log(res);
+            console.log(arraydata.data.length);
+            temp.empty();
+            for (let i = 0; i < arraydata.data.length; i++) {
+              temp += `<tr>
+          <td>${sno}</td>
+          <td>${arraydata.data[i]._id}</td>
+          <td>${arraydata.data[i].name}</td>
+          <td>${arraydata.data[i].trips}</td>
+          <td>${arraydata.data[i].airline.id}</td>
+          <td>${arraydata.data[i].airline.name}</td>
+          <td>${arraydata.data[i].airline.country}</td>
+          <td>${arraydata.data[i].airline.logo}</td>
+          <td>${arraydata.data[i].airline.slogan}</td>
+          <td>${arraydata.data[i].airline.head_quaters}</td>
+          <td>${arraydata.data[i].airline.website}</td>
+          <td>${arraydata.data[i].airline.established}</td>
+          </tr>`;
+              sno++;
+            }
+            $("#result").html(temp);
+            if (a == 1) {
+              $("#third").css("background", "red");
+              $("#fourth").css("background", "none");
+              $("#fifth").css("background", "none");
+              $("#sixth").css("background", "none");
+              $("#sevanth").css("background", "none");
+            }
+          }
+        });
+    }
+    $("#back").click(function () {
+      getData(currentpage);
+    });
+  </script>
+</html>
